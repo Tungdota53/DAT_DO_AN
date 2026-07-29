@@ -1,5 +1,10 @@
+import { AppShell } from "./components/layout/AppShell";
 import { HomePage } from "./pages/HomePage";
 
 export default function App() {
-  return <HomePage />;
+  return (
+    <AppShell>
+      <HomePage />
+    </AppShell>
+  );
 }
