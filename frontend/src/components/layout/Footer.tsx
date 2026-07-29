@@ -12,8 +12,8 @@ export function Footer() {
             <Brand />
           </a>
           <p className="mt-4 max-w-sm text-sm leading-6 text-slate-500">
-            Nền tảng đặt món đang được hoàn thiện theo hợp đồng API FoodGo, ưu tiên trải
-            nghiệm rõ ràng và dễ sử dụng trên mọi thiết bị.
+            Đặt món gọn, nhận món tại cửa và thanh toán COD. FoodGo ưu tiên trải nghiệm
+            rõ ràng, dễ sử dụng trên mọi thiết bị.
           </p>
         </div>
 
@@ -24,7 +24,7 @@ export function Footer() {
           <ul className="mt-4 space-y-3 text-sm text-slate-500">
             <li>
               <a className="transition hover:text-orange-600" href="#discover">
-                Trải nghiệm MVP
+                Trải nghiệm FoodGo
               </a>
             </li>
             <li>
