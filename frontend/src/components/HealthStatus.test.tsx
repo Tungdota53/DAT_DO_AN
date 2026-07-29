@@ -46,6 +46,18 @@ describe("HealthStatus", () => {
     expect(screen.getByRole("button", { name: "Kiểm tra lại" })).toBeInTheDocument();
   });
 
+  it("renders a safe error instead of crashing on an invalid response", async () => {
+    render(
+      <HealthStatus
+        loadHealth={() => Promise.resolve(undefined as unknown as HealthResponse)}
+      />
+    );
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Không thể kết nối đến FoodGo. Vui lòng thử lại."
+    );
+  });
+
   it("keeps a safe error message and retries the request", async () => {
     const loadHealth = vi
       .fn<() => Promise<HealthResponse>>()

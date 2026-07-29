@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { healthApi } from "../api/health-api";
+import { healthApi, isHealthResponse } from "../api/health-api";
 import { toApiRequestError } from "../api/http-client";
 import type { HealthResponse } from "../types/api";
 
@@ -27,6 +27,10 @@ export function useHealth(
     void loadHealth()
       .then((data) => {
         if (isActive) {
+          if (!isHealthResponse(data)) {
+            throw new Error("Invalid health response");
+          }
+
           setState({ status: "success", data, error: null });
         }
       })

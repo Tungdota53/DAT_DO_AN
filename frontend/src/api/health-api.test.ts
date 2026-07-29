@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import type { HealthResponse } from "../types/api";
-import { createHealthApi } from "./health-api";
+import { createHealthApi, parseHealthResponse } from "./health-api";
 
 const apiResponse: HealthResponse = {
   success: true,
@@ -40,5 +40,13 @@ describe("createHealthApi", () => {
     await expect(healthApi.getHealth()).resolves.toEqual(apiResponse);
     expect(apiLoader).toHaveBeenCalledOnce();
     expect(mockLoader).not.toHaveBeenCalled();
+  });
+});
+
+describe("parseHealthResponse", () => {
+  it("rejects a response that does not match the OpenAPI shape", () => {
+    expect(() => parseHealthResponse("<!doctype html>")).toThrow(
+      "API trả về dữ liệu không hợp lệ. Vui lòng thử lại."
+    );
   });
 });
