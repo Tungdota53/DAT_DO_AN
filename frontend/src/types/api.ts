@@ -1,18 +1,18 @@
-export interface ApiSuccess<T> {
-  success: true;
-  message?: string;
-  data: T;
-}
-
-export interface ApiFailure {
+/**
+ * Copied from `components.schemas.ApiError` in `docs/openapi.yaml`.
+ * Keep this shape in sync with the shared contract instead of extending it
+ * with frontend-only fields.
+ */
+export interface ApiError {
   success: false;
   message: string;
   errorCode: string;
 }
 
-export interface Pagination {
-  page: number;
-  limit: number;
-  totalItems: number;
-  totalPages: number;
+/**
+ * Copied from the 200 response of `GET /health` in `docs/openapi.yaml`.
+ */
+export interface HealthResponse {
+  success: true;
+  message: string;
 }
