@@ -1,4 +1,9 @@
-import { type FormEvent, useCallback, useState } from "react";
+import {
+  type FormEvent,
+  useCallback,
+  useRef,
+  useState,
+} from "react";
 
 import { RestaurantSwitchModal } from "../components/cart/RestaurantSwitchModal";
 import {
@@ -12,6 +17,42 @@ import { useCartStore, useCartUiStore } from "../stores/cart-store";
 import type { Food } from "../types/api";
 import { formatCurrency } from "../utils/format";
 
+function animateCartFlight(origin: HTMLElement, foodName: string) {
+  if (
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+    !document.body
+  ) {
+    return;
+  }
+
+  const target = document.querySelector<HTMLElement>("[data-cart-target]");
+  if (!target) return;
+
+  const originRect = origin.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+  const flightSize = 38;
+  const startX = originRect.left + originRect.width / 2 - flightSize / 2;
+  const startY = originRect.top + originRect.height / 2 - flightSize / 2;
+  const endX = targetRect.left + targetRect.width / 2 - flightSize / 2;
+  const endY = targetRect.top + targetRect.height / 2 - flightSize / 2;
+  const flight = document.createElement("span");
+
+  flight.className = "cart-flight";
+  flight.textContent = foodName.slice(0, 1).toUpperCase();
+  flight.setAttribute("aria-hidden", "true");
+  flight.style.setProperty("--flight-start-x", `${startX}px`);
+  flight.style.setProperty("--flight-start-y", `${startY}px`);
+  flight.style.setProperty("--flight-end-x", `${endX}px`);
+  flight.style.setProperty("--flight-end-y", `${endY}px`);
+  flight.style.setProperty("--flight-mid-x", `${startX + (endX - startX) * 0.48}px`);
+  flight.style.setProperty("--flight-mid-y", `${Math.min(startY, endY) - 54}px`);
+
+  document.body.appendChild(flight);
+  const removeFlight = () => flight.remove();
+  flight.addEventListener("animationend", removeFlight, { once: true });
+  window.setTimeout(removeFlight, 700);
+}
+
 export function RestaurantDetailPage({
   restaurantId,
 }: {
@@ -22,6 +63,7 @@ export function RestaurantDetailPage({
   const [categoryId, setCategoryId] = useState<number | undefined>();
   const [pendingFood, setPendingFood] = useState<Food | null>(null);
   const [announcement, setAnnouncement] = useState("");
+  const pendingTrigger = useRef<HTMLButtonElement | null>(null);
   const menu = useRestaurantMenu(restaurantId, search, categoryId);
   const addItem = useCartStore((state) => state.addItem);
   const replaceCartAndAdd = useCartStore((state) => state.replaceCartAndAdd);
@@ -33,7 +75,10 @@ export function RestaurantDetailPage({
     setSearch(input.trim());
   };
 
-  const cancelSwitch = useCallback(() => setPendingFood(null), []);
+  const cancelSwitch = useCallback(() => {
+    pendingTrigger.current = null;
+    setPendingFood(null);
+  }, []);
 
   if (menu.status === "loading") {
     return (
@@ -51,21 +96,29 @@ export function RestaurantDetailPage({
   }
 
   const { restaurant, categories, foods } = menu.data;
-  const onAdd = (food: Food) => {
+  const onAdd = (food: Food, trigger: HTMLButtonElement) => {
     const result = addItem(restaurant, food);
     if (result === "different-restaurant") {
+      pendingTrigger.current = trigger;
       setPendingFood(food);
-      return;
+      return false;
     }
     if (result === "added") {
       setAnnouncement(`Đã thêm ${food.name} vào giỏ`);
+      animateCartFlight(trigger, food.name);
+      return true;
     }
+    return false;
   };
 
   const confirmSwitch = () => {
     if (!pendingFood) return;
     replaceCartAndAdd(restaurant, pendingFood);
     setAnnouncement(`Đã đổi giỏ và thêm ${pendingFood.name}`);
+    if (pendingTrigger.current) {
+      animateCartFlight(pendingTrigger.current, pendingFood.name);
+    }
+    pendingTrigger.current = null;
     setPendingFood(null);
   };
 

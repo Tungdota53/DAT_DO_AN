@@ -14,7 +14,9 @@ const navigation = [
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isCartBumping, setIsCartBumping] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const previousItemCount = useRef<number | null>(null);
   const { pathname } = usePathname();
   const itemCount = useCartStore((state) =>
     state.items.reduce((total, item) => total + item.quantity, 0),
@@ -39,6 +41,20 @@ export function Header() {
     window.addEventListener("scroll", updateHeader, { passive: true });
     return () => window.removeEventListener("scroll", updateHeader);
   }, []);
+
+  useEffect(() => {
+    if (previousItemCount.current === null) {
+      previousItemCount.current = itemCount;
+      return;
+    }
+    const wasIncreased = itemCount > previousItemCount.current;
+    previousItemCount.current = itemCount;
+    if (!wasIncreased) return;
+
+    setIsCartBumping(true);
+    const timer = window.setTimeout(() => setIsCartBumping(false), 520);
+    return () => window.clearTimeout(timer);
+  }, [itemCount]);
 
   return (
     <header
@@ -77,13 +93,16 @@ export function Header() {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            className="cart-button"
+            className={`cart-button ${isCartBumping ? "is-bumping" : ""}`}
+            data-cart-target="true"
             aria-label={`Mở giỏ hàng, ${itemCount} món`}
             onClick={openCart}
           >
             <span className="icon-cart" aria-hidden="true" />
             <span className="hidden sm:inline">Giỏ hàng</span>
-            <span className="cart-count">{itemCount}</span>
+            <span className="cart-count" aria-live="polite">
+              {itemCount}
+            </span>
           </button>
           <button
             ref={menuButtonRef}

@@ -1,3 +1,10 @@
+import {
+  type MouseEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
 import type { Food } from "../../types/api";
 import { formatCurrency } from "../../utils/format";
 
@@ -6,9 +13,35 @@ export function FoodCard({
   onAdd,
 }: {
   food: Food;
-  onAdd: (food: Food) => void;
+  onAdd: (food: Food, trigger: HTMLButtonElement) => boolean | void;
 }) {
   const unavailable = food.status === "NGUNG_BAN";
+  const [isAdded, setIsAdded] = useState(false);
+  const feedbackTimer = useRef<number | null>(null);
+
+  useEffect(
+    () => () => {
+      if (feedbackTimer.current !== null) {
+        window.clearTimeout(feedbackTimer.current);
+      }
+    },
+    [],
+  );
+
+  const handleAdd = (event: MouseEvent<HTMLButtonElement>) => {
+    const didAdd = onAdd(food, event.currentTarget);
+    if (!didAdd) return;
+
+    setIsAdded(true);
+    if (feedbackTimer.current !== null) {
+      window.clearTimeout(feedbackTimer.current);
+    }
+    feedbackTimer.current = window.setTimeout(() => {
+      setIsAdded(false);
+      feedbackTimer.current = null;
+    }, 1100);
+  };
+
   return (
     <article
       className={`rounded-3xl border bg-white p-5 shadow-[0_14px_40px_rgba(15,23,42,0.06)] ${
@@ -44,12 +77,26 @@ export function FoodCard({
             </strong>
             <button
               type="button"
-              className="add-button"
+              className={`add-button ${isAdded ? "is-added" : ""}`}
               disabled={unavailable}
-              onClick={() => onAdd(food)}
+              onClick={handleAdd}
+              aria-label={
+                unavailable
+                  ? `${food.name} không khả dụng`
+                  : isAdded
+                    ? `Đã thêm ${food.name} vào giỏ`
+                    : `Thêm ${food.name} vào giỏ`
+              }
             >
-              <span className="icon-plus" aria-hidden="true" />
-              {unavailable ? "Không khả dụng" : "Thêm món"}
+              <span
+                className={isAdded ? "icon-check" : "icon-plus"}
+                aria-hidden="true"
+              />
+              {unavailable
+                ? "Không khả dụng"
+                : isAdded
+                  ? "Đã thêm"
+                  : "Thêm món"}
             </button>
           </div>
         </div>
