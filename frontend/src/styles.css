@@ -1,8 +1,9 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 :root {
   font-family:
-    Inter,
+    "Work Sans",
     "Segoe UI",
     ui-sans-serif,
     system-ui,
@@ -29,6 +30,27 @@ body {
 button,
 a {
   -webkit-tap-highlight-color: transparent;
+}
+
+button,
+[role="button"],
+a {
+  cursor: pointer;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-black {
+  font-family:
+    "Outfit",
+    "Work Sans",
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
 }
 
 ::selection {
@@ -184,7 +206,7 @@ a {
     inset 0 1px 0 rgb(255 255 255 / 90%);
   transform: rotateY(-5deg) rotateX(2deg);
   transform-style: preserve-3d;
-  transition: transform 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .hero-stage:hover .hero-panel {
@@ -193,7 +215,7 @@ a {
 
 .journey-row {
   opacity: 0;
-  animation: journey-arrive 650ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation: journey-arrive 500ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
   animation-delay: var(--row-delay);
 }
 
@@ -212,7 +234,7 @@ a {
     0 20px 50px rgb(15 23 42 / 12%),
     inset 0 1px 0 rgb(255 255 255 / 90%);
   backdrop-filter: blur(16px);
-  animation: float-note 6s ease-in-out infinite;
+  animation: float-note 5.5s ease-in-out 1;
   will-change: transform;
 }
 
@@ -245,8 +267,24 @@ a {
 
 .landing-reveal {
   opacity: 0;
-  animation: landing-rise 750ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation: landing-rise 560ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
   animation-delay: var(--delay, 0ms);
+}
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+  transition:
+    opacity 500ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  will-change: auto;
 }
 
 .section-eyebrow {
@@ -679,11 +717,14 @@ a {
   }
 
   .landing-reveal,
-  .journey-row {
+  .journey-row,
+  .scroll-reveal {
     opacity: 1;
+    transform: none;
   }
 
-  .floating-note {
+  .floating-note,
+  .scroll-reveal {
     will-change: auto;
   }
 }
@@ -740,6 +781,25 @@ a {
   .footer-title {
     @apply text-xs font-black uppercase tracking-[0.16em] text-slate-950;
   }
+}
+
+.site-header {
+  background: rgb(255 250 244 / 88%);
+  border-color: rgb(255 237 213 / 70%);
+  transition:
+    background-color 250ms ease,
+    border-color 250ms ease,
+    box-shadow 250ms ease;
+}
+
+.site-header.is-scrolled {
+  background: rgb(255 255 255 / 88%);
+  border-color: rgb(226 232 240 / 82%);
+  box-shadow: 0 12px 38px rgb(15 23 42 / 7%);
+}
+
+.nav-link[aria-current="page"] {
+  box-shadow: inset 0 0 0 1px rgb(254 215 170 / 80%);
 }
 
 .brand-mark {
