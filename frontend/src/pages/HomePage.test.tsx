@@ -1,42 +1,42 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { foodgoApi } from "../api/foodgo-api";
 import { HomePage } from "./HomePage";
 
 describe("HomePage", () => {
-  it("renders the MVP introduction and documented service state", async () => {
-    const { container } = render(
-      <HomePage
-        loadHealth={() =>
-          Promise.resolve({
-            success: true,
-            message: "API is running"
-          })
-        }
-      />
-    );
+  afterEach(() => vi.restoreAllMocks());
+
+  it("renders restaurants returned by the real API adapter", async () => {
+    vi.spyOn(foodgoApi, "listRestaurants").mockResolvedValue({
+      success: true,
+      data: [
+        {
+          id: 1,
+          name: "Bếp Việt",
+          address: "12 Nguyễn Trãi, Quận 1",
+          phone: "0901000001",
+          description: "Cơm nhà Việt Nam.",
+          deliveryFee: 15000,
+          availableFoodCount: 3,
+          minPrice: 25000,
+        },
+      ],
+      pagination: { page: 1, limit: 3, totalItems: 1, totalPages: 1 },
+    });
+
+    const { container } = render(<HomePage />);
 
     expect(
-      screen.getByRole("heading", { name: /Món ngon gần bạn, giao tận nơi/i })
+      screen.getByRole("heading", { name: /Món ngon gần bạn/i }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Khám phá FoodGo" })).toHaveAttribute(
+    expect(
+      await screen.findByRole("heading", { name: "Bếp Việt" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Chọn món ngay" })).toHaveAttribute(
       "href",
-      "#discover"
+      "/restaurants",
     );
-    expect(
-      screen.getByRole("heading", {
-        name: "Ít thao tác hơn, nhiều thời gian thưởng thức hơn."
-      })
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", {
-        name: "Từ lựa chọn đầu tiên đến lúc xác nhận đơn."
-      })
-    ).toBeInTheDocument();
-    expect(screen.getAllByText("Không cần đăng nhập").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Một nhà hàng mỗi giỏ").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Thanh toán COD").length).toBeGreaterThan(0);
-    expect(await screen.findByText("Dịch vụ sẵn sàng")).toBeInTheDocument();
     expect(container.textContent).not.toMatch(/\p{Extended_Pictographic}/u);
   });
 });
