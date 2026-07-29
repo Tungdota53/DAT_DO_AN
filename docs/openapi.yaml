@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
   title: FoodGo API
-  version: 0.1.0
-  description: Hợp đồng REST API chính thức của FoodGo.
+  version: 1.0.0
+  description: Hợp đồng REST API cho luồng khách hàng FoodGo MVP.
 servers:
   - url: http://localhost:3000/api
 paths:
@@ -25,8 +25,215 @@ paths:
                   message:
                     type: string
                     examples: [API is running]
+  /restaurants:
+    get:
+      summary: Danh sách nhà hàng
+      operationId: listRestaurants
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Search"
+      responses:
+        "200":
+          description: Danh sách nhà hàng có phân trang
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestaurantListResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+  /restaurants/{restaurantId}:
+    parameters:
+      - $ref: "#/components/parameters/RestaurantId"
+    get:
+      summary: Chi tiết nhà hàng
+      operationId: getRestaurant
+      responses:
+        "200":
+          description: Chi tiết nhà hàng
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Restaurant"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+  /restaurants/{restaurantId}/categories:
+    parameters:
+      - $ref: "#/components/parameters/RestaurantId"
+    get:
+      summary: Loại món đang có tại nhà hàng
+      operationId: listRestaurantCategories
+      responses:
+        "200":
+          description: Danh sách loại món
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/FoodCategory"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+  /restaurants/{restaurantId}/foods:
+    parameters:
+      - $ref: "#/components/parameters/RestaurantId"
+    get:
+      summary: Danh sách món của nhà hàng
+      operationId: listRestaurantFoods
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Search"
+        - name: categoryId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/FoodStatus"
+      responses:
+        "200":
+          description: Danh sách món có phân trang
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FoodListResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+  /orders:
+    post:
+      summary: Tạo đơn giao tận nơi, thanh toán COD
+      description: Giá, phí giao hàng, tổng tiền và trạng thái do Backend đọc và tính.
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrderRequest"
+      responses:
+        "201":
+          description: Đặt món thành công
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                      data:
+                        $ref: "#/components/schemas/Order"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "409":
+          description: Món ngừng bán hoặc món thuộc nhà hàng khác
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /orders/{orderId}:
+    get:
+      summary: Tra cứu đơn bằng mã đơn và số điện thoại
+      operationId: getOrder
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+        - name: phone
+          in: query
+          required: true
+          schema:
+            type: string
+            examples: ["0909999999"]
+      responses:
+        "200":
+          description: Chi tiết và timeline đơn hàng
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Order"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
 components:
+  parameters:
+    RestaurantId:
+      name: restaurantId
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 50
+        default: 12
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+        maxLength: 100
+  responses:
+    ValidationError:
+      description: Dữ liệu đầu vào không hợp lệ
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    NotFoundError:
+      description: Không tìm thấy tài nguyên
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
   schemas:
+    SuccessEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        message:
+          type: string
+        data: {}
     ApiError:
       type: object
       required: [success, message, errorCode]
@@ -38,3 +245,257 @@ components:
           type: string
         errorCode:
           type: string
+          enum:
+            - VALIDATION_ERROR
+            - RESTAURANT_NOT_FOUND
+            - FOOD_NOT_FOUND
+            - FOOD_UNAVAILABLE
+            - DIFFERENT_RESTAURANT
+            - CUSTOMER_NOT_FOUND
+            - ORDER_NOT_FOUND
+            - INVALID_ORDER_STATUS
+            - ORDER_CANNOT_BE_CANCELLED
+            - DATABASE_ERROR
+            - INTERNAL_SERVER_ERROR
+            - NOT_FOUND
+    Pagination:
+      type: object
+      required: [page, limit, totalItems, totalPages]
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        totalItems:
+          type: integer
+        totalPages:
+          type: integer
+    FoodStatus:
+      type: string
+      enum: [CON_BAN, NGUNG_BAN]
+    OrderStatus:
+      type: string
+      enum:
+        - Chờ xác nhận
+        - Đã xác nhận
+        - Đang xử lý
+        - Hoàn thành
+        - Đã hủy
+    Restaurant:
+      type: object
+      required:
+        - id
+        - name
+        - address
+        - phone
+        - description
+        - deliveryFee
+        - availableFoodCount
+        - minPrice
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        address:
+          type: string
+        phone:
+          type: string
+        description:
+          type: [string, "null"]
+        deliveryFee:
+          type: number
+        availableFoodCount:
+          type: integer
+        minPrice:
+          type: [number, "null"]
+    FoodCategory:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    Food:
+      type: object
+      required:
+        - id
+        - restaurantId
+        - categoryId
+        - categoryName
+        - name
+        - description
+        - price
+        - status
+      properties:
+        id:
+          type: integer
+        restaurantId:
+          type: integer
+        categoryId:
+          type: integer
+        categoryName:
+          type: string
+        name:
+          type: string
+        description:
+          type: [string, "null"]
+        price:
+          type: number
+        status:
+          $ref: "#/components/schemas/FoodStatus"
+    RestaurantListResponse:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelope"
+        - type: object
+          required: [pagination]
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/Restaurant"
+            pagination:
+              $ref: "#/components/schemas/Pagination"
+    FoodListResponse:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelope"
+        - type: object
+          required: [pagination]
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/Food"
+            pagination:
+              $ref: "#/components/schemas/Pagination"
+    CreateOrderRequest:
+      type: object
+      additionalProperties: false
+      required: [restaurantId, customer, paymentMethod, items]
+      properties:
+        restaurantId:
+          type: integer
+          minimum: 1
+        customer:
+          type: object
+          additionalProperties: false
+          required: [fullName, phone, deliveryAddress]
+          properties:
+            fullName:
+              type: string
+              minLength: 2
+              maxLength: 150
+            phone:
+              type: string
+            deliveryAddress:
+              type: string
+              minLength: 8
+              maxLength: 300
+        note:
+          type: string
+          maxLength: 500
+        paymentMethod:
+          type: string
+          const: COD
+        items:
+          type: array
+          minItems: 1
+          maxItems: 50
+          items:
+            type: object
+            additionalProperties: false
+            required: [foodId, quantity]
+            properties:
+              foodId:
+                type: integer
+                minimum: 1
+              quantity:
+                type: integer
+                minimum: 1
+                maximum: 99
+    OrderItem:
+      type: object
+      required: [foodId, foodName, quantity, orderedPrice, lineTotal]
+      properties:
+        foodId:
+          type: integer
+        foodName:
+          type: string
+        quantity:
+          type: integer
+        orderedPrice:
+          type: number
+        lineTotal:
+          type: number
+    TimelineEvent:
+      type: object
+      required: [status, occurredAt]
+      properties:
+        status:
+          $ref: "#/components/schemas/OrderStatus"
+        occurredAt:
+          type: string
+          format: date-time
+    Order:
+      type: object
+      required:
+        - id
+        - createdAt
+        - status
+        - restaurant
+        - recipient
+        - note
+        - paymentMethod
+        - items
+        - subtotal
+        - deliveryFee
+        - total
+        - timeline
+      properties:
+        id:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        status:
+          $ref: "#/components/schemas/OrderStatus"
+        restaurant:
+          type: object
+          required: [id, name, phone]
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            phone:
+              type: string
+        recipient:
+          type: object
+          required: [fullName, phone, deliveryAddress]
+          properties:
+            fullName:
+              type: string
+            phone:
+              type: string
+            deliveryAddress:
+              type: string
+        note:
+          type: [string, "null"]
+        paymentMethod:
+          type: string
+          const: COD
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderItem"
+        subtotal:
+          type: number
+        deliveryFee:
+          type: number
+        total:
+          type: number
+        timeline:
+          type: array
+          items:
+            $ref: "#/components/schemas/TimelineEvent"
