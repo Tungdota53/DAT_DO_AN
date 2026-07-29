@@ -15,3 +15,17 @@ export const toOrderStatus = (value: string): OrderStatus => {
 
 export const toFoodStatus = (value: string): FoodStatus =>
   value === "Ngung ban" ? "NGUNG_BAN" : "CON_BAN";
+
+const databaseOrderStatusMap: Record<OrderStatus, string> = {
+  "Chờ xác nhận": "Cho xac nhan",
+  "Đã xác nhận": "Da xac nhan",
+  "Đang xử lý": "Dang xu ly",
+  "Hoàn thành": "Da hoan thanh",
+  "Đã hủy": "Da huy",
+};
+
+export const toDatabaseOrderStatus = (value: OrderStatus) =>
+  databaseOrderStatusMap[value];
+
+export const toDatabaseFoodStatus = (value: FoodStatus) =>
+  value === "NGUNG_BAN" ? "Ngung ban" : "Con ban";

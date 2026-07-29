@@ -65,6 +65,12 @@ export function Footer() {
             >
               Tra cứu trạng thái
             </Link>
+            <Link
+              to="/admin"
+              className="inline-flex min-h-11 w-fit items-center rounded-lg transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
+            >
+              Khu vực quản trị
+            </Link>
             <span>Thanh toán khi nhận hàng</span>
             <span>Không cần đăng nhập</span>
           </nav>

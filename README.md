@@ -56,6 +56,20 @@ Mặc định Backend dùng Windows Trusted Connection. Nếu dùng SQL Authenti
 đặt `DB_TRUSTED_CONNECTION=false` rồi cấu hình `DB_USER` và `DB_PASSWORD` trong
 `backend/.env`. Không commit các file `.env`.
 
+## Trang quản trị
+
+- Mở `http://localhost:5173/admin` để vào FoodGo Control Center.
+- Nhập giá trị `ADMIN_API_KEY` trong `backend/.env`. Khóa chỉ được lưu trong
+  `sessionStorage` của phiên trình duyệt hiện tại và được gửi qua header
+  `x-admin-key` cho các API quản trị.
+- Trang quản trị cho phép quản lý nhà hàng, danh mục, món ăn, khách hàng và
+  cập nhật đơn theo luồng `Chờ xác nhận → Đã xác nhận → Đang xử lý → Hoàn thành`;
+  đơn có thể hủy ở các bước đang xử lý, còn đơn hoàn thành/hủy không thể mở lại.
+- Danh sách đơn hỗ trợ tìm theo mã đơn, khách hoặc nhà hàng và phân trang phía
+  server. Giá trị mẫu trong `.env.example` chỉ dành cho máy local. Production
+  bắt buộc đặt một `ADMIN_API_KEY` riêng tư, dài ít nhất 16 ký tự; không commit
+  file `.env`.
+
 ## Kiểm tra
 
 ```powershell

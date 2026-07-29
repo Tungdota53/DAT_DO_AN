@@ -2,6 +2,7 @@ import { useEffect } from "react";
 
 import { AppShell } from "./components/layout/AppShell";
 import { CheckoutPage } from "./pages/CheckoutPage";
+import { AdminPage } from "./pages/AdminPage";
 import { HomePage } from "./pages/HomePage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { OrderLookupPage } from "./pages/OrderLookupPage";
@@ -11,6 +12,7 @@ import { RestaurantsPage } from "./pages/RestaurantsPage";
 import { usePathname } from "./routes/history";
 
 function resolvePage(pathname: string) {
+  if (pathname === "/admin") return <AdminPage />;
   if (pathname === "/") return <HomePage />;
   if (pathname === "/restaurants") return <RestaurantsPage />;
   if (pathname === "/checkout") return <CheckoutPage />;
@@ -34,8 +36,14 @@ export default function App() {
 
   useEffect(() => {
     document.title =
-      pathname === "/" ? "FoodGo · Đặt món giao tận nơi" : "FoodGo";
+      pathname === "/"
+        ? "FoodGo · Đặt món giao tận nơi"
+        : pathname === "/admin"
+          ? "FoodGo Admin · Quản trị"
+          : "FoodGo";
   }, [pathname]);
+
+  if (pathname === "/admin") return <AdminPage />;
 
   return <AppShell>{resolvePage(pathname)}</AppShell>;
 }
