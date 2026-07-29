@@ -36,7 +36,7 @@ export function HealthStatus({ loadHealth }: HealthStatusProps) {
             className="grid size-10 shrink-0 place-items-center rounded-xl bg-red-100 text-red-700"
             aria-hidden="true"
           >
-            !
+            <span className="icon-alert" />
           </span>
           <div>
             <p className="font-bold text-red-950">Chưa thể kết nối dịch vụ</p>
@@ -81,15 +81,7 @@ export function HealthStatus({ loadHealth }: HealthStatusProps) {
         className="grid size-11 shrink-0 place-items-center rounded-xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
         aria-hidden="true"
       >
-        <svg className="size-5" viewBox="0 0 24 24" fill="none">
-          <path
-            d="m5 12 4 4L19 7"
-            stroke="currentColor"
-            strokeWidth="2.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        <span className="icon-check icon-check-lg" />
       </span>
       <div>
         <p className="font-bold text-emerald-950">Dịch vụ sẵn sàng</p>

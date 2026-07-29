@@ -42,6 +42,132 @@ a {
   text-wrap: balance;
 }
 
+.icon-arrow {
+  position: relative;
+  display: inline-block;
+  width: 0.9rem;
+  height: 0.9rem;
+  flex: 0 0 auto;
+}
+
+.icon-arrow::before {
+  position: absolute;
+  top: 50%;
+  left: 0.05rem;
+  width: 0.68rem;
+  height: 2px;
+  content: "";
+  background: currentColor;
+  transform: translateY(-50%);
+}
+
+.icon-arrow::after {
+  position: absolute;
+  top: 50%;
+  right: 0.05rem;
+  width: 0.42rem;
+  height: 0.42rem;
+  content: "";
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.icon-arrow-muted {
+  width: 0.72rem;
+  height: 0.72rem;
+}
+
+.icon-arrow-muted::before {
+  width: 0.5rem;
+  height: 1px;
+}
+
+.icon-arrow-muted::after {
+  width: 0.3rem;
+  height: 0.3rem;
+  border-width: 1px;
+}
+
+.icon-check {
+  display: inline-block;
+  width: 0.42rem;
+  height: 0.7rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-0.08rem) rotate(45deg);
+}
+
+.icon-check-lg {
+  width: 0.62rem;
+  height: 0.98rem;
+  border-width: 2.5px;
+}
+
+.icon-alert {
+  position: relative;
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-radius: 999px;
+}
+
+.icon-alert::before {
+  position: absolute;
+  top: 0.15rem;
+  left: 50%;
+  width: 2px;
+  height: 0.38rem;
+  content: "";
+  background: currentColor;
+  transform: translateX(-50%);
+}
+
+.icon-alert::after {
+  position: absolute;
+  bottom: 0.14rem;
+  left: 50%;
+  width: 3px;
+  height: 3px;
+  content: "";
+  background: currentColor;
+  border-radius: 999px;
+  transform: translateX(-50%);
+}
+
+.icon-utensils {
+  position: relative;
+  display: inline-block;
+  width: 1.45rem;
+  height: 1.45rem;
+  color: #f97316;
+}
+
+.icon-utensils::before {
+  position: absolute;
+  top: 0.12rem;
+  left: 0.3rem;
+  width: 0.16rem;
+  height: 1.2rem;
+  content: "";
+  background: currentColor;
+  border-radius: 999px;
+  box-shadow: 0.28rem 0 0 currentColor;
+}
+
+.icon-utensils::after {
+  position: absolute;
+  top: 0.12rem;
+  right: 0.22rem;
+  width: 0.17rem;
+  height: 1.2rem;
+  content: "";
+  background: currentColor;
+  border-radius: 999px;
+  transform: rotate(12deg);
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

@@ -73,7 +73,7 @@ export function HomePage({ loadHealth }: HomePageProps) {
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-orange-500 px-6 py-3 text-sm font-black text-white shadow-[0_14px_34px_rgba(249,115,22,0.28)] transition hover:-translate-y-0.5 hover:bg-orange-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-4"
               >
                 Xem cách hoạt động
-                <span aria-hidden="true">→</span>
+                <span className="icon-arrow" aria-hidden="true" />
               </a>
               <a
                 href="#service-status"
@@ -91,7 +91,7 @@ export function HomePage({ loadHealth }: HomePageProps) {
                       className="grid size-5 place-items-center rounded-full bg-emerald-100 text-xs text-emerald-700"
                       aria-hidden="true"
                     >
-                      ✓
+                      <span className="icon-check" />
                     </span>
                     {benefit}
                   </li>
@@ -116,7 +116,7 @@ export function HomePage({ loadHealth }: HomePageProps) {
                   </p>
                 </div>
                 <span className="grid size-11 place-items-center rounded-2xl bg-orange-50 text-2xl">
-                  <span aria-hidden="true">🥢</span>
+                  <span className="icon-utensils" aria-hidden="true" />
                 </span>
               </div>
 
@@ -144,7 +144,7 @@ export function HomePage({ loadHealth }: HomePageProps) {
                       className="text-slate-300 transition group-hover:translate-x-1 group-hover:text-orange-500"
                       aria-hidden="true"
                     >
-                      →
+                      <span className="icon-arrow icon-arrow-muted" />
                     </span>
                   </div>
                 ))}
