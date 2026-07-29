@@ -1,0 +1,14 @@
+{
+  "name": "foodgo",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": ["backend", "frontend"],
+  "scripts": {
+    "dev:backend": "npm run dev --workspace @foodgo/backend",
+    "dev:frontend": "npm run dev --workspace @foodgo/frontend",
+    "build": "npm run build --workspaces --if-present",
+    "type-check": "npm run type-check --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  }
+}

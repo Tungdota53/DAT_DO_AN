@@ -1,0 +1,40 @@
+openapi: 3.1.0
+info:
+  title: FoodGo API
+  version: 0.1.0
+  description: Hợp đồng REST API chính thức của FoodGo.
+servers:
+  - url: http://localhost:3000/api
+paths:
+  /health:
+    get:
+      summary: Kiểm tra trạng thái API
+      operationId: getHealth
+      responses:
+        "200":
+          description: API đang hoạt động
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, message]
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  message:
+                    type: string
+                    examples: [API is running]
+components:
+  schemas:
+    ApiError:
+      type: object
+      required: [success, message, errorCode]
+      properties:
+        success:
+          type: boolean
+          const: false
+        message:
+          type: string
+        errorCode:
+          type: string
