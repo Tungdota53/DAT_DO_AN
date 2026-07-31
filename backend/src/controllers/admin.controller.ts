@@ -164,3 +164,12 @@ export const updateAdminCustomer: RequestHandler = async (
     data: await adminService.updateCustomer(id, body),
   });
 };
+
+export const deleteAdminCustomer: RequestHandler = async (
+  request,
+  response,
+) => {
+  const { id } = request.validated.params as AdminIdParams;
+  await adminService.deleteCustomer(id);
+  response.status(204).send();
+};

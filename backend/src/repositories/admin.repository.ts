@@ -651,6 +651,27 @@ export class AdminRepository {
     return customers.find((customer) => customer.id === id) ?? null;
   }
 
+  public async deleteCustomer(id: number): Promise<boolean> {
+    const dependency = await databasePool
+      .request()
+      .input("id", sql.Int, id)
+      .query<{ SoDon: number }>(
+        `SELECT COUNT(*) AS SoDon FROM dbo.DonHang WHERE MaKhachHang = @id;`,
+      );
+    if (Number(dependency.recordset[0]?.SoDon ?? 0) > 0) {
+      throw new AppError(
+        409,
+        "CONFLICT",
+        "Không thể xóa khách hàng đã có lịch sử đơn hàng",
+      );
+    }
+    const result = await databasePool
+      .request()
+      .input("id", sql.Int, id)
+      .query(`DELETE FROM dbo.KhachHang WHERE MaKhachHang = @id;`);
+    return (result.rowsAffected[0] ?? 0) > 0;
+  }
+
   private async assertRestaurantAndCategory(
     restaurantId: number,
     categoryId: number,

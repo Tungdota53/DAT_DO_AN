@@ -35,4 +35,16 @@ describe("admin request validation", () => {
       errorCode: "VALIDATION_ERROR",
     });
   });
+
+  it("validates customer ids on delete before querying the database", async () => {
+    const response = await request(createApp())
+      .delete("/api/admin/customers/not-a-number")
+      .set("x-admin-key", env.ADMIN_API_KEY);
+
+    expect(response.status).toBe(400);
+    expect(response.body).toMatchObject({
+      success: false,
+      errorCode: "VALIDATION_ERROR",
+    });
+  });
 });

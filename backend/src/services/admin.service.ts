@@ -128,6 +128,17 @@ export class AdminService {
       "Không tìm thấy khách hàng",
     );
   }
+
+  public async deleteCustomer(id: number) {
+    const deleted = await adminRepository.deleteCustomer(id);
+    if (!deleted) {
+      throw new AppError(
+        404,
+        "CUSTOMER_NOT_FOUND",
+        "Không tìm thấy khách hàng",
+      );
+    }
+  }
 }
 
 export const adminService = new AdminService();

@@ -5,6 +5,7 @@ import {
   createAdminFood,
   createAdminRestaurant,
   deleteAdminCategory,
+  deleteAdminCustomer,
   deleteAdminFood,
   deleteAdminRestaurant,
   getAdminDashboard,
@@ -110,4 +111,9 @@ adminRouter.patch(
   "/customers/:id",
   validate({ params: adminIdParamsSchema, body: adminCustomerSchema }),
   updateAdminCustomer,
+);
+adminRouter.delete(
+  "/customers/:id",
+  validate({ params: adminIdParamsSchema }),
+  deleteAdminCustomer,
 );
