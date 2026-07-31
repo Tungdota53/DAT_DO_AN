@@ -184,7 +184,7 @@ export class AdminRepository {
         SoKhach: number;
         SoDon: number;
         SoDonCho: number;
-        DoanhThu: number;
+        TongGiaTriDon: number;
       }>(`
         SELECT
           (SELECT COUNT(*) FROM dbo.NhaHang) AS SoNhaHang,
@@ -197,8 +197,8 @@ export class AdminRepository {
           ) AS SoDonCho,
           (
             SELECT COALESCE(SUM(TongTien), 0) FROM dbo.DonHang
-            WHERE TrangThai = N'Da hoan thanh'
-          ) AS DoanhThu;
+            WHERE TrangThai <> N'Da huy'
+          ) AS TongGiaTriDon;
       `),
       this.listOrders({ limit: 6 }),
     ]);
@@ -210,7 +210,7 @@ export class AdminRepository {
       customerCount: Number(metrics?.SoKhach ?? 0),
       orderCount: Number(metrics?.SoDon ?? 0),
       pendingOrderCount: Number(metrics?.SoDonCho ?? 0),
-      completedRevenue: Number(metrics?.DoanhThu ?? 0),
+      totalOrderValue: Number(metrics?.TongGiaTriDon ?? 0),
       recentOrders: recentOrdersPage.items,
     };
   }
@@ -617,7 +617,7 @@ export class AdminRepository {
         kh.MaKhachHang, kh.TenKhachHang, kh.SoDienThoai,
         kh.DiaChiGiaoHang,
         COUNT(dh.MaDon) AS SoDon,
-        COALESCE(SUM(CASE WHEN dh.TrangThai = N'Da hoan thanh' THEN dh.TongTien ELSE 0 END), 0)
+        COALESCE(SUM(CASE WHEN dh.TrangThai <> N'Da huy' THEN dh.TongTien ELSE 0 END), 0)
           AS TongChiTieu,
         MAX(dh.NgayDat) AS DonGanNhat
       FROM dbo.KhachHang AS kh
