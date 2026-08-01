@@ -59,7 +59,7 @@ export interface AdminDashboard {
   customerCount: number;
   orderCount: number;
   pendingOrderCount: number;
-  completedRevenue: number;
+  totalOrderValue: number;
   recentOrders: AdminOrder[];
 }
 

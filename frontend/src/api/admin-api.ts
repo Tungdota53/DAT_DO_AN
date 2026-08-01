@@ -163,4 +163,11 @@ export const adminApi = {
       headers: auth(key),
       data,
     }),
+
+  deleteCustomer: (key: string, id: number) =>
+    request<void>({
+      method: "DELETE",
+      url: `/admin/customers/${id}`,
+      headers: auth(key),
+    }),
 };

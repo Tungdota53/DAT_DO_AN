@@ -1123,9 +1123,9 @@ export function AdminPage() {
                     "amber",
                   ],
                   [
-                    "Doanh thu hoàn tất",
-                    formatCurrency(dashboard.completedRevenue),
-                    `${dashboard.customerCount} hồ sơ khách hàng`,
+                    "Tổng giá trị đơn",
+                    formatCurrency(dashboard.totalOrderValue),
+                    "Không gồm đơn đã hủy",
                     "green",
                   ],
                 ].map(([label, value, description, tone]) => (
@@ -1550,7 +1550,7 @@ export function AdminPage() {
                         <th>Khách hàng</th>
                         <th>Địa chỉ giao</th>
                         <th>Đơn hàng</th>
-                        <th>Chi tiêu hoàn tất</th>
+                        <th>Tổng giá trị đơn</th>
                         <th className="text-right">Thao tác</th>
                       </tr>
                     </thead>
@@ -1572,7 +1572,7 @@ export function AdminPage() {
                                 : "Chưa có đơn"}
                             </small>
                           </td>
-                          <td data-label="Chi tiêu hoàn tất">
+                          <td data-label="Tổng giá trị đơn">
                             <strong>{formatCurrency(customer.totalSpent)}</strong>
                           </td>
                           <td data-label="Thao tác" className="text-right">
@@ -1585,6 +1585,24 @@ export function AdminPage() {
                                 }
                               >
                                 <AdminIcon name="edit" size={17} />
+                              </button>
+                              <button
+                                type="button"
+                                className="danger"
+                                aria-label={`Xóa ${customer.name}`}
+                                onClick={() =>
+                                  void deleteEntity(
+                                    `Xóa khách hàng “${customer.name}”? Khách đã có đơn hàng sẽ không thể xóa.`,
+                                    () =>
+                                      adminApi.deleteCustomer(
+                                        adminKey,
+                                        customer.id,
+                                      ),
+                                    "Đã xóa khách hàng",
+                                  )
+                                }
+                              >
+                                <AdminIcon name="trash" size={17} />
                               </button>
                             </div>
                           </td>

@@ -184,7 +184,7 @@ export class AdminRepository {
         SoKhach: number;
         SoDon: number;
         SoDonCho: number;
-        DoanhThu: number;
+        TongGiaTriDon: number;
       }>(`
         SELECT
           (SELECT COUNT(*) FROM dbo.NhaHang) AS SoNhaHang,
@@ -197,8 +197,8 @@ export class AdminRepository {
           ) AS SoDonCho,
           (
             SELECT COALESCE(SUM(TongTien), 0) FROM dbo.DonHang
-            WHERE TrangThai = N'Da hoan thanh'
-          ) AS DoanhThu;
+            WHERE TrangThai <> N'Da huy'
+          ) AS TongGiaTriDon;
       `),
       this.listOrders({ limit: 6 }),
     ]);
@@ -210,7 +210,7 @@ export class AdminRepository {
       customerCount: Number(metrics?.SoKhach ?? 0),
       orderCount: Number(metrics?.SoDon ?? 0),
       pendingOrderCount: Number(metrics?.SoDonCho ?? 0),
-      completedRevenue: Number(metrics?.DoanhThu ?? 0),
+      totalOrderValue: Number(metrics?.TongGiaTriDon ?? 0),
       recentOrders: recentOrdersPage.items,
     };
   }
@@ -617,7 +617,7 @@ export class AdminRepository {
         kh.MaKhachHang, kh.TenKhachHang, kh.SoDienThoai,
         kh.DiaChiGiaoHang,
         COUNT(dh.MaDon) AS SoDon,
-        COALESCE(SUM(CASE WHEN dh.TrangThai = N'Da hoan thanh' THEN dh.TongTien ELSE 0 END), 0)
+        COALESCE(SUM(CASE WHEN dh.TrangThai <> N'Da huy' THEN dh.TongTien ELSE 0 END), 0)
           AS TongChiTieu,
         MAX(dh.NgayDat) AS DonGanNhat
       FROM dbo.KhachHang AS kh
@@ -649,6 +649,27 @@ export class AdminRepository {
     if ((result.rowsAffected[0] ?? 0) === 0) return null;
     const customers = await this.listCustomers();
     return customers.find((customer) => customer.id === id) ?? null;
+  }
+
+  public async deleteCustomer(id: number): Promise<boolean> {
+    const dependency = await databasePool
+      .request()
+      .input("id", sql.Int, id)
+      .query<{ SoDon: number }>(
+        `SELECT COUNT(*) AS SoDon FROM dbo.DonHang WHERE MaKhachHang = @id;`,
+      );
+    if (Number(dependency.recordset[0]?.SoDon ?? 0) > 0) {
+      throw new AppError(
+        409,
+        "CONFLICT",
+        "Không thể xóa khách hàng đã có lịch sử đơn hàng",
+      );
+    }
+    const result = await databasePool
+      .request()
+      .input("id", sql.Int, id)
+      .query(`DELETE FROM dbo.KhachHang WHERE MaKhachHang = @id;`);
+    return (result.rowsAffected[0] ?? 0) > 0;
   }
 
   private async assertRestaurantAndCategory(
